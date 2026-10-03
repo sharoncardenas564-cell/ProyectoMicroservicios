@@ -1,82 +1,99 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora - Microservicios</title>
+    <title>Calculadora de Microservicios</title>
 </head>
+
 <body>
 
-<h1>Calculadora</h1>
+    <h1>Calculadora</h1>
 
-<input type="text" id="dato1" placeholder="Dato1">
-<br><br>
+    <label>Dato 1:</label>
+    <input type="number" id="dato1">
 
-<input type="text" id="dato2" placeholder="Dato2">
-<br><br>
+    <br><br>
 
-<button id="btnBody">Sumar Body Params</button>
-<button id="btnQuery">Sumar Query Params</button>
-<button id="btnPath">Sumar Path Params</button>
+    <label>Dato 2:</label>
+    <input type="number" id="dato2">
 
-<br><br>
+    <br><br>
 
-<input type="text" id="resultado" placeholder="Resultado" readonly>
+    <label>Resultado:</label>
+    <input type="text" id="resultado" readonly>
 
-<script>
-const BODY_URL = 'https://REEMPLAZAR-LIMPIEZA-BODY.onrender.com/';
-const QUERY_URL = 'https://REEMPLAZAR-LIMPIEZA-QUERY.onrender.com/';
-const PATH_URL = 'https://REEMPLAZAR-LIMPIEZA-PATH.onrender.com/';
+    <br><br>
 
-document.getElementById('btnBody').addEventListener('click', () => {
-    const dato1 = document.getElementById('dato1').value;
-    const dato2 = document.getElementById('dato2').value;
+    <button id="btnBody">Body Params</button>
+    <button id="btnQuery">Query Params</button>
+    <button id="btnPath">Path Params</button>
 
-    fetch(BODY_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dato1, dato2 })
-    })
-    .then(respuesta => respuesta.json())
-    .then(datos => {
-        document.getElementById('resultado').value = datos.resultado;
-    })
-    .catch(error => {
-        console.error(error);
-        document.getElementById('resultado').value = 'Error';
-    });
-});
+    <script>
 
-document.getElementById('btnQuery').addEventListener('click', () => {
-    const dato1 = document.getElementById('dato1').value;
-    const dato2 = document.getElementById('dato2').value;
+        const dato1 = document.getElementById("dato1");
+        const dato2 = document.getElementById("dato2");
+        const resultado = document.getElementById("resultado");
 
-    fetch(`${QUERY_URL}?dato1=${encodeURIComponent(dato1)}&dato2=${encodeURIComponent(dato2)}`)
-    .then(respuesta => respuesta.json())
-    .then(datos => {
-        document.getElementById('resultado').value = datos.resultado;
-    })
-    .catch(error => {
-        console.error(error);
-        document.getElementById('resultado').value = 'Error';
-    });
-});
+        // BODY PARAMS
+        document.getElementById("btnBody").addEventListener("click", async () => {
 
-document.getElementById('btnPath').addEventListener('click', () => {
-    const dato1 = document.getElementById('dato1').value;
-    const dato2 = document.getElementById('dato2').value;
+            const datos = {
+                dato1: Number(dato1.value),
+                dato2: Number(dato2.value)
+            };
 
-    fetch(`${PATH_URL}${encodeURIComponent(dato1)}/${encodeURIComponent(dato2)}`)
-    .then(respuesta => respuesta.json())
-    .then(datos => {
-        document.getElementById('resultado').value = datos.resultado;
-    })
-    .catch(error => {
-        console.error(error);
-        document.getElementById('resultado').value = 'Error';
-    });
-});
-</script>
+            const respuesta = await fetch(
+                "https://suma-limpieza-body.onrender.com/body",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(datos)
+                }
+            );
+
+            const datosRespuesta = await respuesta.json();
+
+            resultado.value = datosRespuesta.resultado;
+        });
+
+
+        // QUERY PARAMS
+        document.getElementById("btnQuery").addEventListener("click", async () => {
+
+            const numero1 = Number(dato1.value);
+            const numero2 = Number(dato2.value);
+
+            const respuesta = await fetch(
+                `https://suma-limpieza-query.onrender.com/query?dato1=${numero1}&dato2=${numero2}`
+            );
+
+            const datosRespuesta = await respuesta.json();
+
+            resultado.value = datosRespuesta.resultado;
+        });
+
+
+        // PATH PARAMS
+        document.getElementById("btnPath").addEventListener("click", async () => {
+
+            const numero1 = Number(dato1.value);
+            const numero2 = Number(dato2.value);
+
+            const respuesta = await fetch(
+                `https://suma-limpieza-path.onrender.com/path/${numero1}/${numero2}`
+            );
+
+            const datosRespuesta = await respuesta.json();
+
+            resultado.value = datosRespuesta.resultado;
+        });
+
+    </script>
 
 </body>
 </html>
+```
