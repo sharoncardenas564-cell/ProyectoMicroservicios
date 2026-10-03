@@ -1,5 +1,6 @@
-```js
+```javascript
 const http = require("http");
+const https = require("https");
 
 const PORT = process.env.PORT || 3001;
 
@@ -20,7 +21,7 @@ const servidor = http.createServer((req, res) => {
         let body = "";
 
         req.on("data", (parte) => {
-            body += parte;
+            body = body + parte;
         });
 
         req.on("end", () => {
@@ -48,12 +49,12 @@ const servidor = http.createServer((req, res) => {
                     }
                 };
 
-                const peticion = require("https").request(opciones, (respuesta) => {
+                const peticion = https.request(opciones, (respuesta) => {
 
                     let respuestaBody = "";
 
                     respuesta.on("data", (parte) => {
-                        respuestaBody += parte;
+                        respuestaBody = respuestaBody + parte;
                     });
 
                     respuesta.on("end", () => {
@@ -88,7 +89,8 @@ const servidor = http.createServer((req, res) => {
                 });
 
                 res.end(JSON.stringify({
-                    error: "Los datos enviados no son válidos"
+                    error: "Los datos enviados no son válidos",
+                    detalle: error.message
                 }));
             }
         });
@@ -105,7 +107,8 @@ const servidor = http.createServer((req, res) => {
     }));
 });
 
-servidor.listen(PORT, "0.0.0.0", () => {
-    console.log(`Limpieza Body Params en puerto ${PORT}`);
+servidor.listen(PORT, "0.0.0.0", function() {
+    console.log("Limpieza Body Params en puerto " + PORT);
 });
 ```
+
