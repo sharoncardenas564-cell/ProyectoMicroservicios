@@ -1,76 +1,111 @@
-const { createServer, request } = require('node:http');
+```js
+const http = require("http");
 
-const hostname = '0.0.0.0';
-const port = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001;
 
-const serviceHost = process.env.SUMAR_BODY_HOST;
-const servicePort = process.env.SUMAR_BODY_PORT;
+const servidor = http.createServer((req, res) => {
 
-const server = createServer((req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    if (req.method === 'OPTIONS') {
-        res.statusCode = 204;
+    if (req.method === "OPTIONS") {
+        res.writeHead(204);
         res.end();
         return;
     }
 
-    if (req.method !== 'POST') {
-        res.statusCode = 405;
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ error: 'Use POST' }));
+    if (req.url === "/body" && req.method === "POST") {
+
+        let body = "";
+
+        req.on("data", (parte) => {
+            body += parte;
+        });
+
+        req.on("end", () => {
+
+            try {
+
+                const datos = JSON.parse(body);
+
+                const dato1 = Number(datos.dato1);
+                const dato2 = Number(datos.dato2);
+
+                const datosLimpios = JSON.stringify({
+                    dato1: dato1,
+                    dato2: dato2
+                });
+
+                const opciones = {
+                    hostname: "suma-body-0j3x.onrender.com",
+                    port: 443,
+                    path: "/sumar",
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Content-Length": Buffer.byteLength(datosLimpios)
+                    }
+                };
+
+                const peticion = require("https").request(opciones, (respuesta) => {
+
+                    let respuestaBody = "";
+
+                    respuesta.on("data", (parte) => {
+                        respuestaBody += parte;
+                    });
+
+                    respuesta.on("end", () => {
+
+                        res.writeHead(respuesta.statusCode || 200, {
+                            "Content-Type": "application/json"
+                        });
+
+                        res.end(respuestaBody);
+                    });
+                });
+
+                peticion.on("error", (error) => {
+
+                    res.writeHead(500, {
+                        "Content-Type": "application/json"
+                    });
+
+                    res.end(JSON.stringify({
+                        error: "No se pudo conectar con suma-body",
+                        detalle: error.message
+                    }));
+                });
+
+                peticion.write(datosLimpios);
+                peticion.end();
+
+            } catch (error) {
+
+                res.writeHead(400, {
+                    "Content-Type": "application/json"
+                });
+
+                res.end(JSON.stringify({
+                    error: "Los datos enviados no son válidos"
+                }));
+            }
+        });
+
         return;
     }
 
-    let body = '';
-
-    req.on('data', parte => {
-        body += parte;
+    res.writeHead(404, {
+        "Content-Type": "application/json"
     });
 
-    req.on('end', () => {
-        try {
-            const datos = JSON.parse(body);
-            const dato1 = datos.dato1;
-            const dato2 = datos.dato2;
-
-            const peticion = request({
-                hostname: serviceHost,
-                port: servicePort,
-                path: '/',
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            }, respuesta => {
-                let resultado = '';
-
-                respuesta.on('data', parte => resultado += parte);
-
-                respuesta.on('end', () => {
-                    res.statusCode = respuesta.statusCode || 200;
-                    res.setHeader('Content-Type', 'application/json');
-                    res.end(resultado);
-                });
-            });
-
-            peticion.on('error', error => {
-                res.statusCode = 502;
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ error: 'No se pudo contactar la lógica Body Params' }));
-            });
-
-            peticion.write(JSON.stringify({ dato1, dato2 }));
-            peticion.end();
-
-        } catch (error) {
-            res.statusCode = 400;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ error: 'Body inválido' }));
-        }
-    });
+    res.end(JSON.stringify({
+        mensaje: "Ruta no encontrada"
+    }));
 });
 
-server.listen(port, hostname, () => {
-    console.log(`Limpieza Body Params en puerto ${port}`);
+servidor.listen(PORT, "0.0.0.0", () => {
+    console.log(`Limpieza Body Params en puerto ${PORT}`);
 });
+```
