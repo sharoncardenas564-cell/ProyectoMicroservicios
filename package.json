@@ -1,0 +1,17 @@
+{
+  "name": "microservicios-suma-params",
+  "version": "1.0.0",
+  "description": "Microservicios de suma con Body, Query y Path Params",
+  "main": "limpiezaBodyParams.js",
+  "scripts": {
+    "start:body-limpieza": "node limpiezaBodyParams.js",
+    "start:body-suma": "node sumarBodyParams.js",
+    "start:query-limpieza": "node limpiezaQueryParams.js",
+    "start:query-suma": "node sumarQueryParams.js",
+    "start:path-limpieza": "node limpiezaPathParams.js",
+    "start:path-suma": "node sumarPathParams.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

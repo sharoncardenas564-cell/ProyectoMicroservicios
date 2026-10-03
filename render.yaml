@@ -1,0 +1,81 @@
+services:
+  - type: web
+    name: suma-limpieza-body
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node limpiezaBodyParams.js
+    envVars:
+      - key: SUMAR_BODY_HOST
+        fromService:
+          name: suma-body
+          type: web
+          property: host
+      - key: SUMAR_BODY_PORT
+        fromService:
+          name: suma-body
+          type: web
+          property: port
+
+  - type: web
+    name: suma-body
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node sumarBodyParams.js
+
+  - type: web
+    name: suma-limpieza-query
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node limpiezaQueryParams.js
+    envVars:
+      - key: SUMAR_QUERY_HOST
+        fromService:
+          name: suma-query
+          type: web
+          property: host
+      - key: SUMAR_QUERY_PORT
+        fromService:
+          name: suma-query
+          type: web
+          property: port
+
+  - type: web
+    name: suma-query
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node sumarQueryParams.js
+
+  - type: web
+    name: suma-limpieza-path
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node limpiezaPathParams.js
+    envVars:
+      - key: SUMAR_PATH_HOST
+        fromService:
+          name: suma-path
+          type: web
+          property: host
+      - key: SUMAR_PATH_PORT
+        fromService:
+          name: suma-path
+          type: web
+          property: port
+
+  - type: web
+    name: suma-path
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node sumarPathParams.js
+
+  - type: web
+    runtime: static
+    name: suma-frontend
+    buildCommand: echo "Frontend está listo"
+    staticPublishPath: .

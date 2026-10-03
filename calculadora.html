@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora - Microservicios</title>
+</head>
+<body>
+
+<h1>Calculadora</h1>
+
+<input type="text" id="dato1" placeholder="Dato1">
+<br><br>
+
+<input type="text" id="dato2" placeholder="Dato2">
+<br><br>
+
+<button id="btnBody">Sumar Body Params</button>
+<button id="btnQuery">Sumar Query Params</button>
+<button id="btnPath">Sumar Path Params</button>
+
+<br><br>
+
+<input type="text" id="resultado" placeholder="Resultado" readonly>
+
+<script>
+const BODY_URL = 'https://REEMPLAZAR-LIMPIEZA-BODY.onrender.com/';
+const QUERY_URL = 'https://REEMPLAZAR-LIMPIEZA-QUERY.onrender.com/';
+const PATH_URL = 'https://REEMPLAZAR-LIMPIEZA-PATH.onrender.com/';
+
+document.getElementById('btnBody').addEventListener('click', () => {
+    const dato1 = document.getElementById('dato1').value;
+    const dato2 = document.getElementById('dato2').value;
+
+    fetch(BODY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dato1, dato2 })
+    })
+    .then(respuesta => respuesta.json())
+    .then(datos => {
+        document.getElementById('resultado').value = datos.resultado;
+    })
+    .catch(error => {
+        console.error(error);
+        document.getElementById('resultado').value = 'Error';
+    });
+});
+
+document.getElementById('btnQuery').addEventListener('click', () => {
+    const dato1 = document.getElementById('dato1').value;
+    const dato2 = document.getElementById('dato2').value;
+
+    fetch(`${QUERY_URL}?dato1=${encodeURIComponent(dato1)}&dato2=${encodeURIComponent(dato2)}`)
+    .then(respuesta => respuesta.json())
+    .then(datos => {
+        document.getElementById('resultado').value = datos.resultado;
+    })
+    .catch(error => {
+        console.error(error);
+        document.getElementById('resultado').value = 'Error';
+    });
+});
+
+document.getElementById('btnPath').addEventListener('click', () => {
+    const dato1 = document.getElementById('dato1').value;
+    const dato2 = document.getElementById('dato2').value;
+
+    fetch(`${PATH_URL}${encodeURIComponent(dato1)}/${encodeURIComponent(dato2)}`)
+    .then(respuesta => respuesta.json())
+    .then(datos => {
+        document.getElementById('resultado').value = datos.resultado;
+    })
+    .catch(error => {
+        console.error(error);
+        document.getElementById('resultado').value = 'Error';
+    });
+});
+</script>
+
+</body>
+</html>
